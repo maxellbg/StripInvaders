@@ -14,9 +14,9 @@ void setTintPixelColor(uint16_t i, uint32_t c) {
   } 
   else {
     //apply tint effect and SWAP color according to real cabeling
-    r = r*(oscR+1) >> 8;
+    r = r*(oscB+1) >> 8;
     g = g*(oscG+1) >> 8;
-    b = b*(oscB+1) >> 8;
+    b = b*(oscR+1) >> 8;
   }
 
 #ifdef USE_AUDIO_INPUT  
@@ -34,7 +34,10 @@ void setTintPixelColor(uint16_t i, uint32_t c) {
 #endif
 #ifdef USE_LPD8806
   strip.setPixelColor(i, b>>1, g>>1, r>>1);
-#endif  
+#endif
+#ifdef USE_WS2811
+  strip.setPixelColor(i, r, g, b);
+#endif
 
 }
 
@@ -111,6 +114,15 @@ void faderLoop() {
   if (faderSteps++>=FADER_STEPS) {
     mode = modeSave;
   }    
+}
+
+// Fill the dots one after the other with a color
+void colorWipe(uint32_t c, uint8_t wait) {
+  for(uint16_t i=0; i<strip.numPixels(); i++) {
+      strip.setPixelColor(i, c);
+      strip.show();
+      delay(wait);
+  }
 }
 
 //just blink

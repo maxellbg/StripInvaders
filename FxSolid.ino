@@ -17,7 +17,7 @@ void loopSolid() {
           fillAllPixelWith(WHITE_COLOR);
           break;
       case 1:
-          fillAllPixelWith(Wheel(frames%255));
+          fillAllPixelWith(Wheel(frames%255)); 
           break;
       case 2:
           //we get back to this fx AFTER the whole fading is done!

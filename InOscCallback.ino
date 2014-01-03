@@ -6,10 +6,10 @@ void oscCallbackDelay(OSCMessage *_mes){
   //delay between 0ms and 120ms
   DELAY = byte( _mes->getArgFloat(0)*MAX_SLEEP_TIME );
 
-#ifdef USE_SERIAL_DEBUG
+//#ifdef USE_SERIAL_DEBUG
   Serial.print("D:");
   Serial.println(DELAY, DEC);
-#endif 
+//#endif 
 }
 
 //convert the first osc argument and return byte

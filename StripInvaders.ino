@@ -10,7 +10,7 @@
 #include <SPI.h>
 #include <Ethernet.h>
 #include <ArdOSC.h>
-#include <EthernetBonjour.h>
+//#include <EthernetBonjour.h>
 #include <EEPROM.h>
 
 //*************************/
@@ -28,8 +28,9 @@
 
 //*************************/
 // define strip hardware, use only ONE hardware type
-#define USE_WS2801 1
+//#define USE_WS2801 1
 //#define USE_LPD8806 1
+#define USE_WS2811 1
 
 
 #ifdef USE_WS2801
@@ -37,16 +38,19 @@
 #endif
 #ifdef USE_LPD8806
   #include <LPD8806.h>
-#endif  
+#endif
+#ifdef USE_WS2811
+  #include <Adafruit_NeoPixel.h>
+#endif
 
 //*************************/
 // Defines
 
 //use serail debug or not
-//#define USE_SERIAL_DEBUG 1
+#define USE_SERIAL_DEBUG 1
 
 //use DHCP server OR static IP. Using DHCP and static ip as fallback is not possible, too less space left on arduino ethernet
-#define USE_DHCP 1
+// #define USE_DHCP 1
 
 //uncomment it to enable audio
 //#define USE_AUDIO_INPUT 1
@@ -65,7 +69,7 @@ uint8_t faderSteps;
 //*************************/
 // WS2801
 //how many pixels, I use 32 pixels/m
-#define NR_OF_PIXELS 160
+#define NR_OF_PIXELS 60
 
 //EEPROM offset
 #define EEPROM_HEADER_1 0
@@ -95,13 +99,16 @@ WS2801 strip = WS2801();
 #endif
 #ifdef USE_LPD8806
 LPD8806 strip = LPD8806(); 
-#endif  
+#endif
+#ifdef USE_WS2811
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(NR_OF_PIXELS, dataPin, NEO_GRB + NEO_KHZ800);
+#endif
 
 //*************************/
 // Network settings
 
 #ifndef USE_DHCP
-   byte myIp[]  = { 192, 168, 1, 111 };
+   byte myIp[]  = { 192, 168, 178, 177 };
 #endif
 
 byte myMac[] = { 0x00, 0x00, 0xAF, 0xFE, 0xBE, 0x01 };
@@ -146,9 +153,9 @@ void(* resetFunc) (void) = 0; //declare reset function @ address 0
  *****************************************************************************************/
 void setup(){ 
   //init
-  oscR = 255;
-  oscG = 255;
-  oscB = 255;
+  oscR = 20;
+  oscG = 20;
+  oscB = 20;
   mode=0;
 
   int cnt = NR_OF_PIXELS;
@@ -161,7 +168,10 @@ void setup(){
 #endif
 #ifdef USE_LPD8806
   Serial.println("INV8806!");
-#endif    
+#endif
+#ifdef USE_WS2811
+  Serial.println("INV2811!");
+#endif
 
 #endif
 
@@ -254,7 +264,7 @@ void setup(){
   // Initialize the Bonjour/MDNS library. You can now reach or ping this
   // Arduino via the host name "Invader.local", provided that your operating
   // system is Bonjour-enabled (such as MacOS X).
-  EthernetBonjour.begin("Invader");
+/*  EthernetBonjour.begin("Invader");
   
   //load presets
   restorePresetStateFromEeprom();
@@ -268,15 +278,16 @@ void setup(){
   if (ret==0) {
     //error, bonjour service failed
   }
+  */
 }
 
 /*****************************************************************************************
  *  LOOP
  *****************************************************************************************/
-void loop(){    
+void loop(){
   // This actually runs the Bonjour module. YOU HAVE TO CALL THIS PERIODICALLY,
   // OR NOTHING WILL WORK! Preferably, call it once per loop().
-  EthernetBonjour.run();
+//  EthernetBonjour.run();
 
   if (oscServer.aviableCheck()>0){
     //we need to call available check to update the osc server
@@ -292,11 +303,13 @@ void loop(){
     //delay finished, update the strip content
     delayTodo=DELAY;
 
+
+
 #ifdef USE_AUDIO_INPUT
     loopAudioSensor();
 #endif
 
-    switch (mode) {
+switch (mode) {
     case 0: //color lines
       loopLines();
       break;
@@ -333,7 +346,6 @@ void loop(){
     strip.show();    
     frames++;
   } 
-
 }
 
 /*****************************************************************************************
