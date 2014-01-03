@@ -6,6 +6,7 @@
 //  -https://github.com/neophob/WS2801-Library (WS2801, original code by adafruit.com)
 //   OR
 //  -https://github.com/neophob/LPD8806 (LPD8806, original code by adafruit.com)
+//  -https://github.com/adafruit/Adafruit_NeoPixel/blob/master/Adafruit_NeoPixel.h  (WS2811, by adafruit.com)
 
 #include <SPI.h>
 #include <Ethernet.h>
@@ -108,7 +109,7 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(NR_OF_PIXELS, dataPin, NEO_GRB + NEO
 // Network settings
 
 #ifndef USE_DHCP
-   byte myIp[]  = { 192, 168, 178, 177 };
+   byte myIp[]  = { 192, 168, 1, 177 };
 #endif
 
 byte myMac[] = { 0x00, 0x00, 0xAF, 0xFE, 0xBE, 0x01 };
